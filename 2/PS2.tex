@@ -1,0 +1,350 @@
+\documentclass[12pt]{article} \setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in} \setlength{\textwidth}{6.5in}
+\setlength{\parindent}{0in} \setlength{\parskip}{\baselineskip}
+
+\usepackage{amsmath,amsfonts,amssymb,hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=green,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+\begin{document}
+
+CSCI 3104 Spring 2018 \hfill Problem Set 2\\
+Cole Schlisner (01/30)
+
+\hrulefill
+
+\begin{enumerate}
+
+\item \textit{Solve the following recurrence relations using any of
+    the following methods: unrolling, tail recursion, recurrence tree
+    (include tree diagram), or expansion.}
+
+  \textit{Each each case, show your work.}
+  
+  \begin{enumerate}
+  \item \textit{$T(n)=T(n-2)+Cn$ if $n>1$, and $T(n)=C$ otherwise}
+    
+    \textbf{Unrolling:} \\
+
+    % 1A
+    \begin{align}
+    T(n) &= T(n-2) + Cn \\
+    &= (T(n-4) + Cn) + Cn \\
+    &= ((T(n-6) + Cn) + Cn) + Cn \\
+    &= (((T(n-8) + Cn) + Cn) + Cn) + Cn \\
+    ... \\
+    &= T(n-2i) + iCn
+    \end{align}
+
+    \textbf{Base Case}: $n-2i = 1 \implies n = 2i+1 \implies i = \frac{1-n}{2}$ \\
+    \medskip
+    \textbf{Given} $i = \frac{1-n}{2}$ : \\
+    \begin{align}
+    T(n) &= T(n-2i) + iCn \\
+    &= T(1) + \frac{1-n}{2}Cn \\
+    &= C + \frac{1-n}{2}Cn \\
+    &= \Theta(n)
+    \end{align}
+    % 
+  
+  \newpage 
+
+  \item \textit{$T(n)=3T(n-1)+1$ if $n>1$ and $T(1)=3$}
+
+    \textbf{Unrolling:} \\
+
+    % 1B
+    \begin{align}
+      T(n) &= 3T(n-1) + 1 \\
+      &= 3(3T(n-2) + 1) + 1 \\
+      &= 3(3(3T(n-3) + 1) + 1) + 1 \\
+      ... \\
+      &= 3^iT(n-i) + i
+    \end{align}
+
+    \textbf{Base Case}: $n-i = 1 \implies i=n-1$ \\
+    \medskip
+    \textbf{Given} $i = n-1$ : \\
+    \begin{align}
+      T(n) &= 3^iT(n-i)+i \\
+      &= 3^{n-1}T(1)+(n-1) \\
+      &= 3^{n-1}3+n-1 \\
+      &= 3^n + n - 1 \\
+      &= \Theta(3^n)
+    \end{align}
+  
+  \newpage
+
+  \item \textit{$T(n)=T(n-1)+3^n$ if $n>1$ and $T(1)=3$}
+
+    \textbf{Unrolling:} \\
+
+    % 1C
+    \begin{align}
+      T(n) &= T(n-1) + 3^n \\
+      &= T(n-2) + 3^n + 3^n \\
+      &= T(n-3) + 3^n + 3^n + 3^n \\
+      ... \\
+      &= T(n-i) + i3^n
+    \end{align}
+
+    \textbf{Base Case}: $n-i = 1 \implies i=n-1$ \\
+    \medskip
+    \textbf{Given} $i = n-1$ : \\
+    \begin{align}
+      T(n) &= T(n-i) + i3^n \\
+      &= T(1) + (n-1)3^n \\
+      &= n3^n-3^n+3 \\
+      &= \Theta(n3^n)
+    \end{align}
+
+
+  \newpage 
+
+  \item \textit{$T(n)=T(n^{1/4}+1)$ if $n>2$, and $T(n)=0$ otherwise}
+
+    \textbf{Unrolling:} \\
+
+    % 1C
+    \begin{align}
+      T(n) &= T(n^{(\frac{1}{4})}) + 1 \\
+      &= T(n^{(\frac{1}{16})}) + 1 + 1 \\
+      &= T(n^{(\frac{1}{64})}) + 1 + 1 + 1 \\
+      ... \\
+      &= T(n^{(\frac{1}{4^i})}) + i
+    \end{align}
+
+    \textbf{Base Case}: \\
+    \begin{align}
+    n^{(\frac{1}{4^i})} &= 2 \\
+    \frac{1}{4^i}lg(n) &= lg(2) \\
+    lg(n) &= 4^ilg(2) \\
+    4^i &= lg(n) \\
+    ilg(4) &= lg(lg(n)) \\
+    i &= \frac{lg(lg(n))}{2}
+    \end{align}
+    \medskip
+    \textbf{Given} $i = \frac{lg(lg(n))}{2}$ : \\
+    \begin{align}
+    T(n) &= T(n^{\frac{1}{4^i}}) + i \\
+    &= T(n^{\frac{1}{4^{(\frac{lg(lg(n))}{2})}}}) + \frac{lg(lg(n))}{2} \\
+    &= T(2) + \frac{lg(lg(n))}{2} \\
+    &= \frac{lg(lg(n))}{2} \\
+    &= \Theta(lg(lg(n)))
+    \end{align}
+    
+  \end{enumerate}
+  
+  \newpage
+  
+\item \textit{Consider the following function:}
+  
+
+\begin{verbatim}
+    def foo(n) {
+        if (n > 1) {
+        print( ''hello'' )
+        foo(n/3)
+        foo(n/3)
+    }}
+\end{verbatim}
+
+  \textit{In terms of the input n, determine how many times is
+    ``hello'' printed. Write down a recurrence and solve using the
+    Master method.}
+
+  \medskip
+
+  The recursion tree is a binary tree with each node having input $\frac{n}{3}$ of the parent. The recursion stops when the input $n \leq 1$. 
+  \medskip
+
+  Hence the base case is: $\frac{n}{3^i} = 1 \implies i = log_3(n)$ = depth of tree. 
+  "Hello" is printed for each node in this tree, and since it is a full binary tree, there are $2^i$ nodes on the i-th level.
+  Following this, the total number of nodes in the tree excluding the bottom layer (where n = 1) is given by: $$\sum_{i=0}^{log_3(n)-1} 2^i = 2^{log_3(n)}-1$$
+
+  \medskip
+
+  \textbf{Given} $\epsilon = 1 > 0$: \\
+  \begin{align}
+  T(n) &= 2T(n/3) + 1 \\
+  f(n) = 1 &= O(n^{log_3(2) - \epsilon}) \\
+  &= O(1) \\
+  \therefore T(n) &= \Theta(n^{log_3(2)})
+  \end{align}
+
+  
+  \newpage
+
+\item \textit{Professor McGonagall asks you to help her with some
+    arrays that are \texttt{raludominular}. A raludominular array has
+    the property that the subarray $A[1..i]$ has the property that
+    $A[j] > A[j + 1]$ for $1 \le j < i$, and the subarray $A[i..n]$ has
+    the property that $A[j] < A[j + 1]$ for $i \le j < n$. Using her
+    wand, McGonagall writes the following raludominular array on the
+    board $A = [7, 6, 4, -1, -2, -9, -5, -3, 10, 13]$, as an example.}
+
+  \begin{enumerate}
+  \item \textit{Write a recursive algorithm that takes asymptotically
+      sub-linear time to find the minimum element of A.}
+    
+    \begin{verbatim}
+    def globmin(A, i):
+        if (A[i] > A[i+1]):
+            return globmin(A, i+1)
+        else return A[i]
+    \end{verbatim}
+    
+  \item \textit{Prove that your algorithm is correct. (Hint: prove
+      that your algorithm's correctness follows from the correctness
+      of another correct algorithm we already know.)}
+
+    Assuming 0-based indexing:
+    \medskip
+
+    \textbf{Invariant:} $A[i] < \{x | x \in A[0..i-1]\} \vee A[0..i-1] = \varnothing$ \\
+
+    \textbf{Initialization:} i = 0, so A[0..-1] is the empty set and the loop invariant holds. \\
+
+    \textbf{Maintenance:} if ($A[i] > A[i+1]$), the loop invariant holds and the function calls itself with the next index. Otherwise, it returns A[i], as $A[i-1] > A[i] < A[i+1]$. \\
+
+    \textbf{Termination:} once min() returns: $A[i-1] > A[i] < A[i+1]$, and the loop invariant still holds because i was only incremented if $A[i] < A[i-1]$. This means A[i] is the minimum element in the subarray A[0..i]. Combining this fact with the definition of the 'raludominular' array, A[i] must also be the minimum element in the sub array A[i..n]. Thus A[i] must be the minimum element in A[0..n] = A.
+
+    \newpage
+    
+  \item \textit{Now consider the \texttt{multi-raludominular}
+      generalization, in which the array contains k local minima,
+      i.e., it contains k subarrays, each of which is itself a
+      raludominular array. Let $k = 2$ and prove that your algorithm
+      can fail on such an input.}
+
+      \medskip
+    The algorithm will return as soon as it finds an index i such that $$A[i-1] > A[i] < A[i+1]$$ This will be the first local minimum in the first subarray. This will not always be the global minimum, so the algorithm is incorrect for this type of input. 
+
+  \newpage 
+
+  \item \textit{Suppose that $k = 2$ and we can guarantee that neither
+      local minimum is closer than $n=3$ positions to the middle of
+      the array, and that the ``joining point'' of the two
+      singly-raludominular subarrays lays in the middle third of the
+      array. Now write an algorithm that returns the minimum element
+      of A in sublinear time. Prove that your algorithm is correct,
+      give a recurrence relation for its running time, and solve for
+      its asymptotic behavior.}
+
+    \begin{verbatim}
+    def globmin(A, i):
+        while (A[i+1] < A[i]):
+          ++i
+        if (i < (A.length-(A.length/3))):
+          return min(A[i], globmin(A, (A.length-(A.length/3)))
+        return A[i]
+    \end{verbatim}
+    
+    For the while loop on the first two lines of globmin(): \\
+    Let l = the initial value of i before entering the loop. \\
+    Let m = the end of the current raludominular subarray of A \\
+    \textbf{Invariant:} $A[i] < \{x | x \in A[0..i-1]\} \vee A[0..i-1] = \varnothing$ \\
+    \textbf{Initialization:} i = 0, so A[0..-1] is the empty set and the loop invariant holds. \\
+    \textbf{Maintenance:} if ($A[i+1] < A[i]$), i is incremented preserving the loop invariant for the next iteration. \\
+    \textbf{Termination:} the loop exits when $A[i+1] \geq A[i]$, and the loop invariant still holds. Furthermore: $A[l..i-1] > A[i] < A[i+1]$. Combining this with the definition of 'raludominular' arrays means A[i] is the local minimum for the current subarray A[l..m]. 
+
+    \medskip
+
+    Now, if we had just found the first local minimum, the if statement would return True since A[i] is necessarily not within the last third of A. From here, the minimum of A[i] (the first local minimum) and the result of a second call to globmin() starting at the last third of A is returned. We just proved that we will find the second minimum in this second call, and the if statement will now return False - simply returning A[i] (now our second minimum) to be compared with our first minimum. The result of this comparison is returned, meaning we have returned the minimum of our two local minima - the global minimum.
+
+    \newpage
+
+    \textit{Running time:} \\
+    Because the only costs of this algorithm are the while loop and the if statement evaluation (a constant +1 to each recursion), we really just need to calculate how many times the loop runs to find the cost. The loop only runs for each beginning section A[0..i] of the current raludominular subarray. For the first subarray, this is \underline{at most} $(\frac{n}{2})-(\frac{n}{3})=\frac{n}{6}$ (the local minimum in this subarray cannot be closer than $\frac{n}{3}$ to the center of the array at $\frac{n}{2})$. For the second array, we begin iterating at $\frac{n}{3}$ from the end, so this is \underline{at most} $\frac{n}{3}$. 
+
+    \medskip 
+
+    Thus, the maximum number of times i can be incremented during a complete run is $\frac{n}{6} + \frac{n}{3} = \frac{n}{2}$. \\
+
+    A recurrance relation for this algorithm would be: 
+    $$
+    T(n) = 
+    \begin{cases}
+      T(n/3) + \frac{n}{6} + 1, & \text{if}\ n<A.length-(A.length/3) \\
+      1, & \text{otherwise}
+    \end{cases}
+    $$
+
+    However a relation is not needed. Since we know the maximum possible aggregate value ($\frac{n}{2}$) of the driving term, it follows that $T(n) = O(\frac{n}{2} + 2) = O(n)$.\\
+
+  \end{enumerate}
+
+  \newpage
+  
+\item \textit{Asymptotic relations like $O$, $\Omega$, and $\Theta$ represent
+    relationships between functions, and these relationships are
+    transitive. That is, if some $f(n) = \Omega(g(n))$, and
+    $g(n) = \Omega(h(n))$, then it is also true that
+    $f(n) = \Omega(h(n))$. This means that we can sort functions by their
+    asymptotic growth.\footnotemark}
+
+  \textit{Sort the following functions by order of asymptotic growth
+    such that hte final arrangement of functions
+    $g_1,g_2 \dots,g_{12}$ satisfies the ordering constraint
+    $g_1 = \Omega(g2)$, $g_2 = \Omega(g_3)$, \dots , $g_{11}=\Omega(g_{12})$}.
+
+
+  \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|}
+    \hline
+    $n$ & $n^{1.5}$ & $8^{\lg n}$ & $4^{\lg* n}$ & $n!$ &$(\lg n)!$ & $(\frac{5}{4})^n$ & $n^{1/ \lg n}$ & $n \lg n$ & $\lg(n!)$ & $e^n$ & $42$ \\
+    \hline
+  \end{tabular}
+
+  \textit{Give the final sorted list and identify which pair(s)
+    functions $f(n)$, $g(n)$, if any, are in the same equivalence
+    class, i.e., $f(n) = \Theta(g(n))$.}
+
+  \textbf{From highest order to lowest order:}
+  \begin{itemize}
+    \item $n!$
+    \item $e^n$
+    \item $(\frac{5}{4})^n$
+    \item $lg(n)!$
+    \item $8^{lg(n)}$
+    \item $n^{1.5}$
+    \item $n$
+    \item $4^{lg^*(n)}$
+    \item $42$
+    \item $n^{\frac{1}{lg(n)}}$
+  \end{itemize}
+
+  \begin{align}
+    42 = \Theta(x^{\frac{1}{lg(n)}}) 
+  \end{align}
+
+\end{enumerate}
+
+\footnotetext{The notion of sorting is entirely general: so long as
+  you can define a pairwise comparison operator for a set of objects
+  \texttt{S} that is transitive, then you can sort the things in
+  \texttt{S}. For instance, for strings, we use a comparison based on
+  lexical ordering to sort them. Furthermore, we can use any sorting
+  algorithm to sort \texttt{S}, by simply changing the comparison
+  operators $>$, $<$, etc. to have a meaning appropriate for
+  \texttt{S}. For instance, using $\Omega$, $O$, and $\Theta$, you could apply
+  QuickSort or MergeSort to the functions here to obtain the sorted
+  list.}
+
+\newpage
+
+\textbf{References Used}
+
+\hrulefill
+
+\begin{enumerate}
+  \item CLRS
+  \item \url{https://courses.engr.illinois.edu/cs173/fa2009/Lectures/lect_22.pdf}
+  \item \url{https://en.wikipedia.org/wiki/Iterated_logarithm}
+\end{enumerate}
+  
+
+\end{document}
