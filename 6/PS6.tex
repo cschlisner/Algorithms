@@ -210,15 +210,41 @@ are).}
 \textit{For the following, assume that Dumbledore gives you an input consisting of a single
 array $S$ where the $i$-th element S[i] describes the i-th range as a pair $(s_i, l_i)$ where $s_i < l_i$.}
 
-
+\pagebreak 
 \begin{enumerate}
 \item[(a)]\textit{In pseudo-code, give a greedy algorithm that computes the minimum-size covering
 subset $T$ in $\mathcal{O}(n \log n)$ time. Explain your solution in plain English as well, and
 prove an $\mathcal{O}(n \log n)$ upper bound on its running time. (Hint: Start with the earliest
 range.)}
-\\\\
-TODO
 \\
+\begin{verbatim}
+def greedyRanges(r){
+    S = r                           // copy input to array S
+    u = 0                           // latest uncovered time
+    T = []                          // list of selected ranges
+    maxl = max([x[1] for x in S])   // maximum extent of ranges
+    while (u < maxl) {  
+        maxrg=(0,0)      // range that maximizes additional coverage from t <= u
+        for rg in S {
+            if (rg[0] <= u and rg[1] > u and rg[1] - u > maxrg[1] - u):
+                maxrg = rg  // update maximum across all ranges
+        }
+        if maxrg == (0,0):          // there were no ranges beginning at or before u (a gap)
+            min([x[0] for x in S])  // set u to the minimum range start and repeat 
+            continue
+        u = maxrg[1]        // set u to the end of the maximum range
+        T.append(maxrg)     // add the maximum range to the selected ranges
+        S.remove(maxrg)     // remove the maximum range from S, to save time
+    }
+    return T
+}
+\end{verbatim}
+
+This algorithm optimizes for the largest amount of new time covered beginning from the end of the previous covered time. \\
+Specifically it chooses the range r $\in$ S such that $l_r - u$ is maximal given $s_r <= u$, where u is the latest time that is not covered by a selected range. 
+
+
+
 \item[(b)]\textit{Prove that your algorithm is correct, in particular, that it correctly computes the \textbf{minimum-size} covering subset.}
 \\\\
 TODO
