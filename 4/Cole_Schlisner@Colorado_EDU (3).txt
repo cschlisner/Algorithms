@@ -1,0 +1,30 @@
+Total Score 38.5/60+28 ec
+Nicely typeset 3/3
+1 Score 8/10
+1 Comment ----- Not good enough
+2 (a) Score 2/2
+2 (a) Comment ----- 
+2 (b) Score 2/2
+2 (b) Comment ----- 
+2 (c) Score 4/4
+2 (c) Comment ----- 
+2 (d) Score 1/2
+2 (d) Comment ----- comprare process wrong,
+3 (a) Score 4.5/6
+3 (a) Comment ----- See solutions. Be careful with loop index range.
+3 (b) Score 7/7
+3 (b) Comment ----- 
+3 (c) Score 2/7
+3 (c) Comment ----- see solutions
+3 (d) Score 0/5
+3 (d) Comment ----- 
+4 (a) Score 3/6
+4 (a) Comment ----- Sorting n^(1/3) elements using insertion sort would take Θ(n^(1/3))^2. See solutions.
+4 (b) Score 1/7
+4 (b) Comment ----- Not true in worst case scenario
+4 (c) Score 1/7
+4 (c) Comment ----- see solutions
+5 (a) Score 0/10
+5 (a) Comment ----- 
+5 (b) Score 0/10
+5 (b) Comment ----- 

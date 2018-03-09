@@ -1,0 +1,22 @@
+Total Score 46.5/60+18 ec
+Nicely typeset /3
+1 (a) Score 3/5
+1 (a) Comment ----- 9-10 should be n^2
+1 (b) Score 5/5
+1 (b) Comment ----- 
+1 (c) Score 3/5
+1 (c) Comment ----- wrong steps 26-29. See solutions.
+1 (d) Score 5/5
+1 (d) Comment ----- 
+2 Score 10/10
+2 Comment ----- 
+3 (a) Score 6/8
+3 (a) Comment ----- Pretty close. But your algorithm does not work in sub-linear time.
+3 (b) Score 5/8
+3 (b) Comment ----- see solutions
+3 (c) Score 5/5
+3 (c) Comment ----- 
+3 (d) Score 4.5/9
+3 (d) Comment ----- See solutions.
+4 Score /15
+4 Comment ----- 
