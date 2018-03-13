@@ -21,10 +21,14 @@ american]{csquotes} \usepackage[none]{hyphenat} \usepackage{url}
 % Graph
 \usepackage{tikz}
 
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
 \begin{document}
 
 \noindent CSCI 3104 Spring 2018 \hfill Problem Set 7\\
-First Last (mm/dd)
+Cole Schlisner (03/10)
 
 \hrulefill
 
@@ -117,26 +121,138 @@ extractAlignment(S,x,y) : // S is an optimal cost matrix from alignStrings
       \texttt{STEP} and the \texttt{EXPONENTIAL} / \texttt{POLYNOMIAL}
       examples in the lecture notes (to do this exactly, youâ€™ll need
       to use unit costs instead of the ones given above).}
+    \pagebreak
     \\\\
-    TODO
-    \\
+    \textbf{alignStrings:}
+    This implementation is essentially the same algorithm as the pseudocode provided, except instead of using a separate function cost(i,j) to determine the optimal subproblem cost it just stores the subproblem costs in an array and picks the minimum. 
+    The specific subproblems stored in the cost array (added with their respective costs) are S[i-2][j-2] (Swap), S[i-1][j-1] (Sub), S[i-1][j] (Delete), S[i][j-1] (Insert). S[i][j], the current subproblem is set to the minimum of these. 
+    The algorithm first initializes S with the base cases (first column and first row), and then computes each row sequentially using the previous entries in the table. \\\\
+    \textit{python 3.6:}
+    \begin{verbatim}
+    def alignStrings(x,y):
+      costS = 12
+      costT = 13
+      costID = 1
+
+      # Y on top, X on side as in example
+      S = [[0 for j in range(len(y)+1)] for i in range(len(x)+1)]
+      
+      # base cases = cost of aligning empty strings 
+      for j in range(len(y)+1):
+        S[0][j] = j
+      for i in range(len(x)+1):
+        S[i][0] = i
+
+      for i in range(1,len(x)+1):
+        for j in range(1,len(y)+1):
+          cost = []
+          
+          # Swap -- i-2,j-2
+          if j > 1 and i > 1:
+            cost.append(S[i-2][j-2] + costT
+                  + (0 if (x[i-1] == y[j-2]) else 1)
+                  + (0 if (y[j-1] == x[i-2]) else 1))
+          
+          # Sub -- i-1,j-1
+          cost.append(S[i-1][j-1] + (costS if x[i-1] != y[j-1] else 0))
+          
+          # insert -- i,j-1
+          cost.append(S[i][j-1] + costID)
+          
+          # delete -- i-1,j
+          cost.append(S[i-1][j] + costID)
+          
+          S[i][j] = min(cost)
+      return S
+    \end{verbatim}
+    \pagebreak
+
+    \textbf{extractAlignment:}
+    This implementation works in largely the same way that alignStrings works -- by looking at each relevant subproblem and picking the minimum. The differences are that (a) this is done in reverse and (b) instead of setting S[i][j] to this minimum value, we record which subproblem the minimum came from (using the \textit{ops} array) and then set the coordinates i and j to the coordinates of the subproblem. Specifically, this algorithm records the indicies of all subproblems with the minimum value within the cost array and picks one at random. This allows the algorithm to break ties evenly if there are two or more subproblems that yield the same optimal solution. My implementation also records the indicies of the chosen subproblems in an array (\textit{optimalpath}) so that the path of the extracted alignment can be visualized easily. \\
+    \textit{python 3.6 (next page):}
+    \pagebreak
+    \begin{verbatim}
+    import random
+    def extractAlignment(S,x,y):
+      costS = 12
+      costT = 13
+      costID = 1
+      optimaledits = []
+      optimalpath = [[0 for j in range(len(y)+1)] for i in range(len(x)+1)]
+      i = len(x)
+      j = len(y)
+      while i > 0 or j > 0:
+        optimalpath[i][j] = 1
+        # build cost array of tuples = (symbol, cost)   
+        cost = []
+        cost.append(("s", S[i-1][j-1] + (costS if x[i-1] != y[j-1] else 0))) 
+        cost.append(("i", S[i][j-1] + costID))
+        cost.append(("d", S[i-1][j] + costID))
+        if j > 1 and i > 1:
+          cost.append(("t", S[i-2][j-2] + costT 
+                  + (0 if (x[i-1] == y[j-2]) else 1)
+                  + (0 if (y[j-1] == x[i-2]) else 1)))
+        # the current optimal value is the minimum of cost
+        optval = S[i][j]
+        
+        # choose one of the edits at random that have the same cost 
+        # as the current optimal value 
+        opt = random.choice([c[0] for c in cost if c[1] == optval])
+        
+        # if the characters in both strings were the same (and it was a sub),
+        # then insert "|" (no-op) at the beginning of the list
+        if (opt == "s" and x[i-1] == y[j-1]):
+          optimaledits.insert(0, "|")
+
+        # otherwise insert the operation 
+        else: optimaledits.insert(0,opt)
+        
+        # update the indicies to the selected subproblem
+        if opt == "s":
+          i -= 1
+          j -= 1
+        elif opt == "i":
+          j -= 1
+        elif opt == "d":
+          i -= 1
+        elif opt == "t":
+          optimaledits.insert(0,opt)
+          i -= 2
+          j -= 2
+      return optimaledits, optimalpath
+  \end{verbatim}
+
+  \textbf{commonSubstrings:}
+  This implementation of commonSubstrings() simply scans through the list of edit operations \textit{a}, and looks for the no-op character "$\vert$". Once this is found it adds the corresponding character in X (which is the same in Y) to the last substring in an array of common substrings. For each sequential "$\vert$" in \textit{a}, the same thing is done, until an edit operation in \textit{a} is found which is not a no-op ("$\vert$"), then the algorithm adds a new empty string to the list of common substrings. Now, if another no-op sequence is found, the characters will be added to this new empty string. The algorithm will add all common substrings to the array, and then return a filtering of this array by length L. \\
+  \textit{python 3.6:}
+  \begin{verbatim}
+  def commonSubstrings(x,L,a):
+    substr = [""]
+    for i in range(len(a)):
+      if a[i] == "|":
+        substr[-1] += x[i]
+      else: 
+        substr.append("")
+    return [s for s in substr if len(s) >= L]
+  \end{verbatim}
+
+  \pagebreak
+
   \item[(b)] \textit{Using asymptotic analysis, determine the running
-      time of the call \texttt{commonSubstrings(x, L,
-        extractAlignment( alignStrings(x,y), x,y ) )} Justify your
+      time of the call $$\texttt{commonSubstrings(x, L,
+        extractAlignment( alignStrings(x,y), x,y ) )}$$ Justify your
       answer.}
     \\\\
-    TODO
-    \\
-  \item[(c)] \textit{(15 pts extra credit) Describe an algorithm for
-      counting the number of optimal alignments, given an optimal cost
-      matrix $S$. Prove that your algorithm is correct, and give is
-      asymptotic running time.}
+    \begin{itemize}
+    \item The first function called within this call is \textit{alignStrings} -- the running time of alignStrings is $O(n_xn_y)$, as each entry in the ($n_x$ x $n_y$) table is calculated in constant time (the process of picking the minimum of the previous optimal solutions). The cost of the setup before these calculations is $\Theta(n_xn_y) + \Theta(n_x) + \Theta(n_y)$ and thus does not contribute to the total running time. 
+    \item The second function call is \textit{extractAlignment} -- this takes $O(n_y+n_x)$ time in the worst case, which corresponds to deleting the input string X and inserting the target string Y. In terms of the cost table, this would require the algorithm to visit (and do a constant time operation on) each entry along the perimeter of the table (i.e. the longest path from S[i,j] to S[0,0]). In the best case, the input string and the target string are the same and \textit{extractAlignment} takes $O(n_y)$ -- the cost of visiting each entry along the diagonal (a series of no-ops). 
+    \item The final function call is \textit{commonSubstrings} -- this will take $\Theta(n_a)$, as it is a simple loop through the edit operations array (plus another loop through the created substrings array to filter by length).
+    \end{itemize}
 
-    \textit{Hint: Convert this problem into a form that allows us to
-      apply an algorithm weâ€™ve already seen.}
-    \\\\
-    TODO
-    \\
+    Thus the total running time of the call would be $O(n_xn_y) + O(n_x + n_y))$ = $O(n_xn_y)$
+    
+    \pagebreak
+
   \item[(d)] \textit{String alignment algorithms can be used to detect
       changes between different versions of the same document (as in
       version control systems) or to detect verbatim copying between
@@ -149,8 +265,28 @@ extractAlignment(S,x,y) : // S is an optimal cost matrix from alignStrings
       $L = 9$ or more that could have been taken from y, and briefly
       comment on whether these documents could be reasonably
       considered original works, under CU's academic honesty policy.}
-    \\\\
-    TODO
+    \\    
+    \includegraphics[width=15cm,height=5cm]{1d}
+
+    This is the input string (x.txt) formatted so that green characters are those which were kept via no-ops, and the red characters are characters that were deleted. Dashes represent insertions, and underscores represent spaces. It is immediately apparent that a large portion of the text was identical, however here are the common substrings of length at least 9:
+
+    \begin{itemize}
+      \item "manufacturing "
+      \item " gulf coast "
+      \item "the company's "
+      \item " a keynote speech today "
+      \item "conference"
+      \item "," said woods. ""
+      \item "."  exxon"
+      \item "mobil is strategically investing in new refining and chemical-manufacturing projects in the u"
+      \item " gulf coast region to expand its manufacturing and export capacity. the company’s growing the gulf"
+      \item " consists of 11 major chemical, refining, lubricant and liquefied natural gas projects at proposed new and existing facilities along the texas and louisiana coasts. investments began in 2013 and are expected to continue through at least 2022. "
+      \item " to create "
+      \item "facturing "
+    \end{itemize}
+
+    This would classify as a violation of the honor policy, as the news article quoted the press release without citing the source. 
+
   \end{enumerate}
 
   \newpage
@@ -203,20 +339,23 @@ MemPell(n) {
         \texttt{MemPell}. Prove your claim is correct by induction on
         the contents of the array.}
     \end{enumerate}
-    TODO
-    \\
-  \item[(b)] \textit{Ron then claims that he can beat Hermioneâ€™s
+    \begin{enumerate}
+      \item[i.] If MemPell(n-1) is the left subtree, and MemPell(n-2) is the right, then the computation would look like a post-order traversal because it computes all of the (n-1) terms down to the base case, and then computes each corresponding (n-2) term before returning. The array is filled sequentially from the beginning to the end starting from the base cases. 
+      \item[ii.] Because of the post-order traversal, each P[n] for n $\in$ [2..n] is calculated before anything else in the tree, which memoizes all pell numbers $\le$ n. Thus there is no computation left to do for the rest of the tree. Thus the running time must be O(n).
+    \end{enumerate}
+    \pagebreak
+  \item[(b)] \textit{Ron then claims that he can beat Hermione's
       dynamic programming algorithm in both time and space with
       another dynamic programming algorithm, which eliminates the
       recursion completely and instead builds up directly to the final
       solution by filling the P array in order. Ron's new algorithm
-      \footnote{Ron is now using Hermioneâ€™s undefined array trick;
+      \footnote{Ron is now using Hermione's undefined array trick;
         assume he also uses her solution of wrapping this function
         within another that correctly allocates the array.} is}
 
 \begin{verbatim}
 DynPell(n) :
-  P[0] = 0, L[1] = 1
+  P[0] = 0, P[1] = 1
   for i = 2 to n { P[i] = 2*P[i-1] + P[i-2] }
   return P[n]
 \end{verbatim}
@@ -224,12 +363,14 @@ DynPell(n) :
     Determine the time and space usage of \texttt{DynPell(n)}. Justify
     your answers and compare them to the answers in part (2a).
     \\\\
-    TODO
+    \textbf{T(n)} = O(n), because the loop is executed n-2 times, each time doing a constant-time operation.\\
+    \textbf{S(n)} = O(n), as the array is exactly n elements.\\
+    This is exactly the same time and space cost as Hermoine's algorithm. The array is even filled in in the same order. 
     \\
   \item[(c)] \textit{With a gleam in her eye, Hermione tells Ron that
       she can do everything he can do better: she can compute the
       $n$th Pell number even faster because intermediate results do
-      not need to be stored. Over Ronâ€™s pathetic cries, Hermione says}
+      not need to be stored. Over Ron's pathetic cries, Hermione says}
 
 \begin{verbatim}
 FasterPell(n) :
@@ -247,8 +388,11 @@ FasterPell(n) :
     determine the time and space usage of
     \texttt{FasterPell(n)}. Justify your claims.
     \\\\
-    TODO
-    \\
+    \textbf{error:} c = 2 * a + b \\
+    \textbf{correction:} c = 2 * b + a \\
+    \textbf{T(n)}= O(n) - this is a simple loop doing three O(1) operations n-2 times \\
+    \textbf{S(n)}= O(1) - only three numbers are stored at any given time.  
+  \pagebreak
   \item[(d)] \textit{In a table, list each of the four algorithms as
       columns and for each give its asymptotic time and space
       requirements, along with the implied or explicit data structures
@@ -257,19 +401,40 @@ FasterPell(n) :
       what data structure do all recursive algorithms implicitly
       use?)}
     \\\\
-    TODO
-    \\
+    \begin{tabular}{ |p{3cm}||p{2cm}|p{2cm}|p{2cm}|p{2cm} }
+     \hline
+      & Pell(n) & MemPell(n) & DynPell(n) & FasterPell(n)\\
+     \hline
+     \hline
+     Running Time   & O($2^n$)    & O(n)&  O(n) & O(n)\\
+     \hline
+     Space &   O(1)  & O(n) & O(n)  & O(1)\\
+     \hline
+     Data Structs& Tree & Array/Tree& Array & None \\
+     \hline
+    \end{tabular}
+    \\\\
+    MemPell improves upon Pell by memoizing results in the computation tree - all of the pell numbers are computed along the left subtree. This is an improvement in time at the cost of space. DynPell does not improve upon MemPell in time or space. FasterPell is an improvement on DynPell/MemPell because it uses the same method of calculation without memoizing the intermediate results - this is like only using the last 3 rows in the napsack problem. 
 
   \item[(e)] \textit{(5 pts extra credit) Implement
       \texttt{FasterPell} and then compute $P_n$ where n is the
       four-digit number representing your MMDD birthday, and report
       the first five digits of $P_n$. Now, assuming that it takes one
       nanosecond per operation, estimate the number of years required
-      to compute $P_n$ using Ronâ€™s classic recursive algorithm and
+      to compute $P_n$ using Ron's classic recursive algorithm and
       compare that to the clock time required to compute $P_n$ using
       FasterPell.}
     \\\\
-    TODO
+    First 5 digits of $P_{0828}=P_{828}$: 14916 \\\\
+    Number of years for good ol' ronny boy's algorithm: $2^{828}$ns = 5.672*$10^{232}$ years (according to Wolfram alpha) \\\\
+    Real time according to unix: 0m0.240s
   \end{enumerate}
   % ---------------------------------------------------
+  \newpage
+
+\textbf{References} \\
+\hrulefill
+\begin{enumerate}
+  \item CLRS
+\end{enumerate}
 \end{document}
