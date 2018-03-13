@@ -1,0 +1,43 @@
+Total Score 57/55 reg, 16 ec
+Nicely typeset 3/3
+1 (a) Score /1
+1 (a) Comment ----- 
+1 (b) Score /1
+1 (b) Comment ----- 
+1 (c) Score /1
+1 (c) Comment ----- 
+1 (d) Score /1
+1 (d) Comment ----- 
+1 (e) Score /1
+1 (e) Comment ----- 
+1 (f) Score /1
+1 (f) Comment ----- 
+1 (g) Score /1
+1 (g) Comment ----- 
+1 (h) Score /1
+1 (h) Comment ----- 
+1 (i) Score 1/1
+1 (i) Comment ----- 
+1 (j) Score 1/1
+1 (j) Comment ----- 
+2 (a) Score 3/3
+2 (a) Comment ----- 
+2 (b) Score 3/3
+2 (b) Comment ----- 
+2 (c) Score 3/3
+2 (c) Comment ----- 
+2 (d) Score 3/3
+2 (d) Comment ----- Nice job
+2 (e) Score 3/3
+2 (e) Comment ----- Nice job
+3 (a) Score 5/5
+3 (a) Comment ----- Nice
+3 (b) Score 10/10
+3 (b) Comment ----- Nice
+4 (a) Score 9/10
+4 (a) Comment ----- Failed to correct 1 mistake.
+4 (b) Score 3/5
+4 (b) Comment ----- Need complexity analysis. See the solutions.
+5 Score 10/10
+5 Comment ----- well done
+Dinosaur extra credit /3
