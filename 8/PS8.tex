@@ -102,18 +102,29 @@ Consider the following graph G, set of tree edges $E_T$, and starting vertex $s$
 \begin{enumerate}
 \item[(a)]{\textit{An \textbf{adjacency matrix} representation. Assume
       the size of the matrix is known.}}\\\\
-  $\Theta(|V|^2 = n^2)$ - In order to calculate the degree of all nodes, you would need to visit each row of the matrix adj[i][*], and scan across all of the entries (adj[i][j]) in order to calculate (the degree for V[i]) = $$d(V[i]) = \sum_{j=0}^{|E|=m}{(adj[i][j] = \sum{[w(i,j) \forall (V_i,V_j) \in E]} - \sum{[w(j,i) \forall (V_j,V_i) \in E]})}$$  (which is a constant time operation, asuming the matrix is precalculated\footnote{Calculating this matrix with that formula would take $\Theta(2|E||V|^2)$ time} and G is a directed graph\footnote{The direction of the edge can be assumed : $(V_i,V_j) \implies $ there is an edge from $V_i$ to $V_j$}). 
+  $\Theta(|V|^2)$ - In order to calculate the degree of all nodes, you would need to visit each row of the matrix m[i][*], and scan across all of the entries (m[i][j]) in order to read the number of incoming and outgoing edges between V[i] and V[j]. Assuming this information is already stored in the entries in m, reading the data is a constant time operation.\footnote{If $m[i][j] = (\sum{[1 \forall (V_i,V_j) \in E]} , \sum{[1 \forall (V_j,V_i) \in E]})$ calculating this matrix would take $\Theta(2|E||V|^2)$ time}
   \\
 \item[(b)]{\textit{An \textbf{edge list} representation. Assume
       vertices have arbitrary labels.}}
   \\\\
-  TODO
-  \\
+  $\Theta(|E|)$ - consider the following algorithm to calculate degrees of all verticies:
+  \begin{verbatim}
+  forall (u,v) in E:
+    u.outd += 1
+    v.ind += 1 
+  \end{verbatim}
+  Where V.ind, V.outd = the in and out degrees of the vertex V, respectively. 
 \item[(c)]{\textit{An \textbf{adjacency list} representation. Assume
       the vector’s length is known.}}
   \\\\
-  TODO
-
+  $\Omega(|E|)$ - as an adjacency list stores the same data as an edge list, a similar algorithm works:
+  \begin{verbatim}
+  forall u in V:
+    forall v in u.adj:
+      u.outd += 1
+      v.ind += 1
+  \end{verbatim}
+  Where u.adj = $\{v$ $|$ $v \in V$, $(u,v) \in E\}$. In order for this to be asymptotically slower than the edge list, there would need to be a factor of $|E|$ more verticies with no outgoing edges than edges, as there is an implied constant time operation in the second for loop which occurs even if u.adj is empty. 
 \end{enumerate}
 
 \newpage
@@ -127,7 +138,7 @@ Consider the following graph G, set of tree edges $E_T$, and starting vertex $s$
   series of arbitrary instances of this problem, the parrot will
   unlock a secret passageway.}
 
-\textit{Let $G = (E, V)$ denote a directed multigraph. $A$ directed
+\textit{Let $G = (V,E)$ denote a directed multigraph. $A$ directed
   simple graph is a $G' = (V, E')$, such that $E'$ is derived from the
   edges in $E$ so that (i) every directed multiedge, e.g.,
   ${(u, v), (u, v)}$ or even simply ${(u, v)}$, has been replaced by a
