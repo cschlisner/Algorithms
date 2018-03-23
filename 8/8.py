@@ -13,16 +13,25 @@ def printmeme(g):
 
 def fixmeme(g):
 	for i in range(len(g)):
-		adj = [] 
 		j = 0
+		t = {i+1:1}
 		while j < len(g[i]):
-			if g[i][j] == i+1:
-				g[i].pop(j)
-			elif g[i][j] in adj:
+			if g[i][j] in t:
 				g[i].pop(j)
 			else: 
-				adj.append(g[i][j])
+				t[g[i][j]] = 1
 				j += 1
+
+def convert(g):
+	gprime = [[]]
+	for i in range(len(g)):
+		r = [False for k in range(len(g))]
+		for e in g[i]:
+			if e != i+1:
+				r[e-1] = True
+		gprime[i] = [e+1 for e in range(len(g)) if r[e]]
+	g = gprime
+					
 G = gen_data(5)
 
 printmeme(G)

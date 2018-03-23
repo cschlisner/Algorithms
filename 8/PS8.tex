@@ -21,7 +21,7 @@ american]{csquotes} \usepackage[none]{hyphenat} \usepackage{url}
 \begin{document}
 
 \noindent CSCI 3104 Spring 2018 \hfill Problem Set 8\\
-First Last (mm/dd)
+Cole Schlisner (3/22)
 
 % Image
 \graphicspath{ {images/} }
@@ -80,7 +80,7 @@ Consider the following graph G, set of tree edges $E_T$, and starting vertex $s$
   \includegraphics[width=6cm,height=6cm]{2-G-ET}
 
   There are only 2 different paths that DFS could take from $s$ to explore the entire graph.
-  Here are visualizations of these paths using the notation for timestamps (d/f) from CLRS.\footnote{Forgive my MSPaint skills}
+  Here are visualizations of these paths using the notation for timestamps (d/f) from CLRS.
 
   \includegraphics[width=6cm,height=6cm]{2-G-P1} \includegraphics[width=6cm,height=6cm]{2-G-P2} 
 
@@ -117,14 +117,15 @@ Consider the following graph G, set of tree edges $E_T$, and starting vertex $s$
 \item[(c)]{\textit{An \textbf{adjacency list} representation. Assume
       the vector’s length is known.}}
   \\\\
-  $\Omega(|E|)$ - as an adjacency list stores the same data as an edge list, a similar algorithm works:
+  $\Theta(|V|+|E|)$ - as an adjacency list stores the same data as an edge list, a similar algorithm works:
   \begin{verbatim}
   forall u in V:
     forall v in u.adj:
       u.outd += 1
       v.ind += 1
   \end{verbatim}
-  Where u.adj = $\{v$ $|$ $v \in V$, $(u,v) \in E\}$. In order for this to be asymptotically slower than the edge list, there would need to be a factor of $|E|$ more verticies with no outgoing edges than edges, as there is an implied constant time operation in the second for loop which occurs even if u.adj is empty. 
+  Where u.adj = $\{v$ $|$ $v \in V$, $(u,v) \in E\}$. \\
+  Because $\sum_{i=0}^{n}{V[i].adj.length}$ = $|E|$, the constant time operations in the inner loop occur $|E|$ times. Howeer the outer loop still runs $|V|$ times, and there is an implicit constant time operation in evaluating the inner loop condition. 
 \end{enumerate}
 
 \newpage
@@ -159,7 +160,37 @@ Consider the following graph G, set of tree edges $E_T$, and starting vertex $s$
   ordered in any particular way, and remember that you can add edges
   to the list and then remove ones you don't need.}
 \\\\
-TODO
+Here's a complete algorithm in python3:\\
+\textit{let g = 2 dimensional list representing the adjacency lists.\\ Verticies are numbered starting at 0}\\
+\begin{verbatim}
+def convert(g):
+  for i in range(len(g)):
+    j = 0
+    t = {i:1}
+    while j < len(g[i]):
+      if g[i][j] in t:
+        g[i].pop(j)
+      else: 
+        t[g[i][j]] = 1
+        j += 1
+\end{verbatim}
+
+This algorithm works by scanning through all adjacency lists $u$.adj $\forall$ $u$ $\in$ V, and deleting all duplicate verticies (multipaths) as well as occurances of $u$ (self-loops). Duplicates are kept track of using a hashmap (dictionary in the above Python), thus determining if a vertex has been seen before is $\Theta(1)$. 
+
+\textbf{Time - }The outer loop runs $|V| = n$ times, and the inner loop will run $\sum_{i=0}^{n}{V[i].adj.length}$ = $|E|$ times. Because each operation inside the inner loop is constant, the total running time is $O(V + E)$ 
+
+\textbf{Space - }The only auxiliary space needed is the hashmap which takes $O(V)$ space (For each vertex, there can be at most one edge between each vertex)
+\pagebreak
+
+\textbf{Correctness:} Consider the inner loop, which is run for each vertex $u$ $\in V$:
+
+\textit{Invariant: } g[i][0 .. j-1] = \{g[i][0 .. j-1]\} $\wedge$ i $\notin$ g[i][0 .. j-1] (i.e. $V_i$.adj contains no duplicates or $V_i$)
+
+\textit{Initialization: } Before the loop enters, j=0 $\implies$ g[0][0..j-1] = $\O$ = \{$\O$\}, i $\notin$ $\O$
+
+\textit{Maintainence: } During the loop, if g[i][j] is in the map of values we have seen before then it is deleted from g[i]. Because i was previously inserted into the map, every occurance of i will be deleted. If if g[i][j] is not in the map, it is added to the map, and j is increased. Note that j does not need to be increased if we delete a value, because the length of g[i] shrinks by 1, which has the same effect. After this, j-1 is the index of the vertex we just evaluated -- in the event we deleted it, the invariant still holds as it is no longer in g[i], in the event we didn't, it was the first value of j seen so it was added to the map and the variant still holds. 
+
+\textit{Termination: } After the loop exits, j = g[i].length $\implies$ g[i][0 .. j-1] = g[i] = \{g[i]\} as every duplicate vertex and vertex = i was removed. 
 
 \newpage
 
@@ -189,17 +220,25 @@ TODO
       state the specific question about this graph that must be
       answered.}}
   \\\\
-  TODO
-  \\
+  Let each vertex be a 3-tuple value in the form a/b/c where a = level of the 27-mort battery, b = level of the 16-mort battery, and c = level of the 42-mort battery. \\
+  A graph can be made of the possible states that can be obtained by one of the possible set of arguments to the mort transfer spell: $mts(a,b), mts(a,c), ... , mts(c,b)$: \\
+  \includegraphics[width=10cm,height=8cm]{5-G}
+
+  Each edge is bidirectional unless illustrated with an arrow indicating direction. 
+  \pagebreak
 \item[(b)]{\textit{What algorithm should Ron apply to solve the graph
       problem?}}
   \\\\
-  TODO
+  Dijkstra
   \\
 \item[(c)]{\textit{Apply that algorithm to McGonagall’s
       question. Report and justify your answer.}}
   \\\\
-  TODO
+(27,16,0) \\
+$ mts(a,c) \Rightarrow$ (0,16,27) \\
+$ mts(b,c) \Rightarrow$ (0,1,42) \\
+$ mts(c,a) \Rightarrow$ (27,1,15) \\
+$ mts(a,b) \Rightarrow$ (12,16,15)
 
 \end{enumerate}
   
