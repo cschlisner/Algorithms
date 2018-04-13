@@ -24,7 +24,7 @@ american]{csquotes} \usepackage[none]{hyphenat} \usepackage{url}
 \begin{document}
 
 \noindent CSCI 3104 Spring 2018 \hfill Problem Set 9\\
-First Last (XX/XX)
+Cole Schlisner (04/12)
 
 % Image
 \graphicspath{ {images/} }
@@ -80,9 +80,35 @@ are added simultaneously in a single round.)}
   \centering \includegraphics[width=0.5\textwidth]{P2}
 \end{figure}
 
+\newpage
 
-TODO
-
+\begin{enumerate}
+  \item[\textbf{i.}]
+    \textbf{Weights:}\\
+    \includegraphics[width=0.4\textwidth]{P2-weights} \\
+  \item[\textbf{ii.}]
+    \textbf{MST:} \\
+    \includegraphics[width=0.4\textwidth]{P2-mst} \\
+    \textbf{SSSPs 1-7:} \\
+    \includegraphics[width=0.4\textwidth]{P2-sssp1}
+    \includegraphics[width=0.4\textwidth]{P2-sssp2}\\
+    \includegraphics[width=0.4\textwidth]{P2-sssp3}
+    \includegraphics[width=0.4\textwidth]{P2-sssp4}\\
+    \includegraphics[width=0.4\textwidth]{P2-sssp5}
+    \includegraphics[width=0.4\textwidth]{P2-sssp6}\\
+    \includegraphics[width=0.4\textwidth]{P2-sssp7}
+  \item[\textbf{iii.}]
+    \textbf{Prim:} \\
+    \includegraphics[width=0.4\textwidth]{P2-prim}\\
+    \textbf{Kruskal:}\\
+    \includegraphics[width=0.4\textwidth]{P2-kruskal}\\
+    \newpage
+    \textbf{Boruvka:}\\
+    \includegraphics[width=0.4\textwidth]{P2-boruvka1}\\
+    \includegraphics[width=0.4\textwidth]{P2-boruvka2}\\
+    \includegraphics[width=0.4\textwidth]{P2-boruvka3}\\
+    \includegraphics[width=0.4\textwidth]{P2-boruvka4}
+\end{enumerate}
 \newpage
 
 % ******************* PROBLEM 3 *********************
@@ -140,22 +166,24 @@ better.}
 \\\\
 
 \begin{enumerate}
-\item[(a)]{\textit{Given examples to show that, in the worst case, the asymptotic running time of
+\item[(a)]{\textit{Give examples to show that, in the worst case, the asymptotic running time of
 bidirectional BFS is the same as that of ordinary BFS. Note that because we are
 asking for asymptotic running time, you actually need to provide an infinite family
 of examples $(G_n , s_n , t_n )$ such that $s_n, t_n \in V(G_n)$, the asymptotic running time of
 BFS and bidirectional BFS are the same on inputs $(G_n, s_n, t_n)$, and $|V(G_n)| \rightarrow \infty$ as $n \rightarrow \infty$}}
   \\\\
-  TODO
+  I don't know how to answer this.
   \\
+  \pagebreak
 \item[(b)]{\textit{Recall that in ordinary BFS we used a \texttt{state} array (see Lecture Notes 8) to keep track of which nodes had been visited before. In bidirectional BFS we will need two
 \texttt{state} arrays, one for the BFS from $s$ and one for the BFS from $t$. Why? Give an
 example to show what can go wrong if there’s only one state array. In particular,
 give a graph $G$ and two vertices $s, t$ such that some run of a bidirectional BFS
 says there is no path from $s$ to $t$ when in fact there is one.}}
   \\\\
-  TODO
-  \\
+  \includegraphics[width=0.4\textwidth]{P4-b} \\
+  In this diagram, each red number indicates the order in which a given node was marked as "old" by either the BFS tree growing from vertex s or the BFS tree growing from t. The tree growing from s would next attempt to explore the vertex marked "4", but it can't because it was marked as "old" by the BFS tree from t. Thus, the algorithm with one state array would not find a path between s and t. 
+  \newpage
   \item[(c)]{\textit{Implement from scratch a function \texttt{BFS(G,s,t)} that performs an ordinary BFS in the (unweighted, directed) graph G to find a shortest path from s to t. Assume
 the graph is given as an adjacency list; for the list of neighbors of each vertex,
 you may use any data structure you like (including those provided in standard
@@ -163,14 +191,115 @@ language libraries). Have your function return a pair $(d, k)$, where $d$ is the
 from $s$ to $t$ ($-1$ if there is no $s$ to $t$ path), and $k$ is the number of nodes popped
 off the queue during the entire run of the algorithm.}}
   \\\\
-  TODO
-  \\
+  \begin{verbatim}
+  def BFS(g, s, t):
+    # distance can't be more than 2|V|
+    dist = [len(g)*2 for i in range(len(g))]
+    # False = NEW, True = OLD
+    old = [False for i in range(len(g))]
+
+    dist[s] = 0
+
+    Q = [(None, s)]
+
+    d = 0
+    
+    while (len(Q) > 0):
+      # dequeue u,v   
+      (u,v) = Q.pop(0)
+      d += 1
+
+      if not old[v]:
+        old[v] = True
+      
+        if u is not None:
+          dist[v] = dist[u] + 1
+      
+        # add all neighbors of v
+        for i in range(len(g)):
+          if g[v][i]:
+            if i == t:
+              return (dist[v]+1, d)
+            Q.append((v, i))
+    return (-1, d)
+  \end{verbatim}
+  \newpage
 \item[(d)]{\textit{Implement from scratch a function \texttt{BidirectionalBFS(G,s,t)} that takes in an (unweighted, directed) graph $G$, and two of its vertices $s,t$, and performs a bidirectional BFS. As with the previous function, this function should return a pair
 $(d, k)$ where $d$ is the distance from $s$ to $t$ ($-1$ if there is no path from $s$ to $t$) and $k$ is the number of vertices popped off of both queues during the entire run of the
 algorithm.}}
   \\\\
-  TODO
-  \\
+  The next two pages contain a complete Python (3.5) program containing the function, as well as a function to generate an arbitrary sized directed graph for testing. (Assume page break preserves indentation) \pagebreak
+  \begin{verbatim}
+  import random as r
+  import numpy as np
+
+  def bidirectionalBFS(g, s, t):
+    # distance can't be more than 2|V|
+    Sdist = [len(g)*2 for i in range(len(g))]
+    Tdist = [len(g)*2 for i in range(len(g))]
+    # False = NEW, True = OLD
+    Sstate = [False for i in range(len(g))]
+    Tstate = [False for i in range(len(g))]
+
+    Sdist[s] = 0
+    Tdist[t] = 0
+
+    SQ = [(None, s)]
+    TQ = [(None,t)]
+
+    d = 0
+    
+    # keep track of which tree we are growing
+    S_BFS = True
+    while (len(SQ) > 0 and len(TQ) > 0):
+      # choose which state/dist/queue to use
+      old = Sstate if S_BFS else Tstate
+      dist = Sdist if S_BFS else Tdist
+      Q = SQ if S_BFS else TQ
+
+      # dequeue u,v   
+      (u,v) = Q.pop(0)
+      d += 1
+
+      if not old[v]:
+        old[v] = True
+      
+        if u is not None:
+          dist[v] = dist[u] + 1
+      
+        # if v was marked as old by other tree, there is a path
+        if (S_BFS and Tstate[v]) or (not S_BFS and Sstate[v]):
+          return (Tdist[v]+Sdist[v], d)
+        
+        # add all neighbors of v
+        for i in range(len(g)):
+          if g[v][i]:
+            # if the node we are looking for is a neighbor, there is a path
+            if i == (t if S_BFS else s):
+              return (dist[v]+1, d)
+            Q.append((v, i))
+        
+        S_BFS = not S_BFS
+    
+    return (-1, d)
+
+  """
+    Generates (n * n) boolean matrix where:
+      (g[1][2] == True) => there is a directed edge from vertex 1 to vertex 2
+  """
+  def generate_directed_graph(n):
+    g = [[r.choice([True,False]) for i in range(n)] for j in range(n)]
+    # remove all self loops
+    for i in range(n):
+      g[i][i] = False
+
+    return g
+
+  G = generate_directed_graph(7)
+  print(np.array(G))
+  print(bidirectionalBFS(G,0,6))
+  \end{verbatim}
+  \newpage
 \item[(e)]{\textit{For each of the following families of graphs $G_n$ , write code to execute BFS and BidirectionalBFS on these graphs, and produce the following output:}
     \begin{itemize}
     \item \textit{In text, the tuples $(n, d_1, k_1, d_2, k_2)$ where $n$ is the index of the graph, $(d_1, k_1)$ is the output of \texttt{BFS} and $(d_2, k_2)$ is the output of \texttt{BidirectionalBFS}.}
@@ -203,7 +332,7 @@ average values of $(d_1, k_ 1, d_2, k_2 )$ over those 50 trials. Produce this ou
     \end{enumerate}
   }
 
-  TODO
+  I don't know
 
 \end{enumerate}
 
